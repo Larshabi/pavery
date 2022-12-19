@@ -2,6 +2,9 @@ const User = require('../../models/user');
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const { validateRegisterBody, validateLoginBody } = require('./auth.validation');
+const { emailVerification, resetEmail } = require('../../utils/email-verification');
+const moment = require('moment');
+const Token = require('../../models/token');
 
 
 
@@ -28,7 +31,11 @@ const AuthController = {
         delete value.fullName
 
         user = await User.create({...value, firstName: firstName, lastName: lastName })
+        await emailVerification(user)
+        console.log('done')
         user = _.pick(user, ['_id', 'email', 'phoheNumber', 'firstName', 'lastName'])
+
+
 
         return res.status(201).json({
             status: 'success',
@@ -71,6 +78,59 @@ const AuthController = {
             status: 'success',
             message: 'Login successful',
         })
+    },
+    async verifyEmail(req, res) {
+        const token = await Token.findOne({ hash: req.params.hash });
+        if (!token) {
+            return res.status(400).json({ message: 'Invalid token' })
+        }
+        if (moment().isAfter(moment(token.expiresIn))) {
+            return res.status(400).json({ message: 'Token expired' })
+        }
+        const user = await User.findOneAndUpdate({ _id: token.user }, { isVerified: true });
+        return res.status(200).json({ message: 'User Verified', user })
+    },
+    async verifyTokenValidity(req, res) {
+        const token = await Token.findOne({ hash: req.params.hash })
+        if (!token) {
+            return res.status(400).json({ message: 'Invalid token' })
+        }
+        if (moment().isAfter(moment(token.expiresIn))) {
+            return res.status(400).json({ message: 'Expired Token' })
+        }
+        return res.status(200)
+    },
+    async refreshEmail(req, res) {
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            return res.status(400).json({ message: 'Email not registered' });
+        }
+        EmailVerification(user);
+        return res.json({ message: 'Email verification mail sent' })
+    },
+    async resetPassword(req, res) {
+        const user = await User.findOne({ email: req.body.email })
+        if (!user) {
+            return res.status(400).json({ message: 'Email not registered' });
+        }
+        resetEmail(user);
+        return res.status(200).json({
+            message: 'Password reset email sent'
+        })
+    },
+    async updatePassword(req, res) {
+        const token = await Token.findOne({ hash: req.params.hash })
+        if (!token) {
+            return res.status(400).json({ message: 'Invalid token' })
+        }
+        if (!moment().isAfter(moment(token.expiresIn))) {
+            return res.status(400).json({ message: 'Token Expired' })
+        }
+        const salt = bcrypt.gensalt();
+        const hash = bcrypt.hash(req.body.password, salt);
+
+        const user = await User.findOneAndUpdate({ _id: token.user }, { password: hash })
+        return res.status(200).json({ message: 'Password updated' })
     }
 
 }

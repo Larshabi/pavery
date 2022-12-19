@@ -6,6 +6,13 @@ const router = Router();
 
 router.post('/user/register', asyncHandler(AuthController.userRegistration));
 
-router.post('/user/login', asyncHandler(AuthController.userLogin))
+router.post('/user/login', asyncHandler(AuthController.userLogin));
 
+router.get('/verify-email/:hash', asyncHandler(AuthController.verifyEmail));
+
+router.post('/reset-password', asyncHandler(AuthController.resetPassword));
+
+router.get('/update-password/:hash', asyncHandler(AuthController.updatePassword));
+
+router.post('/refresh-email', asyncHandler(AuthController.refreshEmail));
 module.exports = router;
