@@ -5,6 +5,8 @@ const { validateRegisterBody, validateLoginBody } = require('./auth.validation')
 const { emailVerification, resetEmail } = require('../../utils/email-verification');
 const moment = require('moment');
 const Token = require('../../models/token');
+const {encode, validate} = require('../../utils/jwt');
+const {filterJwtPayload} = require('../../helpers/index');
 
 
 
@@ -31,7 +33,7 @@ const AuthController = {
         delete value.fullName
 
         user = await User.create({...value, firstName: firstName, lastName: lastName })
-        await emailVerification(user)
+        // await emailVerification(user)
         console.log('done')
         user = _.pick(user, ['_id', 'email', 'phoheNumber', 'firstName', 'lastName'])
 
@@ -57,12 +59,12 @@ const AuthController = {
                 mesage: 'Email not registered'
             })
         }
-        // if (!user.isVerified) {
-        //     return res.status(400).json({
-        //         status: 'error',
-        //         message: 'Please verify your email'
-        //     })
-        // }
+        if (!user.isVerified) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Please verify your email'
+            })
+        }
 
         const isMatch = await bcrypt.compare(value.password, user.password)
         if (!isMatch) {
@@ -71,12 +73,26 @@ const AuthController = {
                 message: 'Incorrect password'
             })
         }
+
+        user = _.pick(user, ['firstName', 'lastName', 'email', 'phoneNumber', 'isActive', 'isVerified', 'lastLogin']);
+        console.log(user);
+
+        const filteredPayload = filterJwtPayload(user);
+        const accessToken = encode(filteredPayload, process.env.accessTokenSecret, '2h')
+
+
+        const tokens = {
+            accessToken,
+        }
+
         const now = new Date()
         await User.updateOne({ _id: user._id }, { lastLogin: now })
 
         return res.status(200).json({
             status: 'success',
             message: 'Login successful',
+            user,
+            tokens
         })
     },
     async verifyEmail(req, res) {

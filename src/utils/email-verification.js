@@ -24,7 +24,7 @@ exports.emailVerification = async(user) => {
         to: user.email,
         from: 'chisom.okafor@comeriver.com',
         subject: 'Email Verification',
-        text: 'Okay chisom I have heard you',
+        text: link,
         html: `<h1>Hello Chisom</h1>`
     }
     sgMail
