@@ -17,7 +17,7 @@ exports.itemValidationBody = (payload)=>{
          VAT:Joi.number().required(),
          pricePerChannel:Joi.boolean().required(),
          category:Joi.objectId(),
-         modifiers:Joi.array()
+         modifiedGroup:Joi.array()
    })
    return schema.validate(payload);
 }

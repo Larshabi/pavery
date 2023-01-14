@@ -1,6 +1,7 @@
 const Item = require('../../models/item');
 const {itemValidationBody} = require('./products.validation');
 const {parse} = require('json2csv');
+const fs = require('fs');
 
 const ItemController = {
     async createItem(req, res){
@@ -45,11 +46,33 @@ const ItemController = {
         })
     },
     async downloadTemplate(req, res){
-        const fields = Object.keys(Item.schema.obj);
-        const csv = parse({data:'', fields})
-        res.set("Content-Disposition", "attachment;filename=item.csv");
-        res.set("Content-Type", "application/octet-stream");
-
+        let fields = Object.keys(Item.schema.obj);
+        fields = [
+            {
+                name:'',
+                internalName:'',
+                description:'',
+                price:'',
+                VAT:'',
+                pricePerChannel:'Yes or No',
+                category:'',
+                isModifiedGroup:'Yes or No',
+                isAvailable:'Yes or No',
+                modifiedGroup:''
+            }
+        ]
+        const csv = parse(fields)
+        fs.writeFile("item.csv", csv, function(err){
+            if(err){
+                return res.status(400).json({
+                    err
+                })
+            }
+            console.log('File saved')
+        })
+        // res.set("Content-Disposition", "attachment;filename=item.csv");
+        // res.set("Content-Type", "application/octet-stream");
+        res.attachment("item.csv")
         res.send(csv);
     },
     async updateItem(req, res){

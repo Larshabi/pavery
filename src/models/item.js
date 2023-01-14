@@ -17,11 +17,11 @@ const itemSchema = new Schema({
         type:Boolean,
         default:false
     },
-    isModifierGroup:{
+    isModifiedGroup:{
         type:Boolean,
         default:false
     },
-    modifiers:[String]
+    modifiedGroup:[String]
 },
 {
     timestamps:true
