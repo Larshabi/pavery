@@ -6,14 +6,14 @@ const ModifierController = {
         const {error, value} = modifierValidationBody(req.body);
         if(error){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 error
             })
         }
         let modifier = await Modifier.findOne({name:value.name})
         if(modifier){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'Modified group exists'
             })
         }
@@ -28,7 +28,7 @@ const ModifierController = {
         const modifiers = await Modifier.find({})
         if(!modifiers){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'There are no modified groups'
             })
         }
@@ -42,7 +42,7 @@ const ModifierController = {
         const modifier = await Modifier.findOne({_id:id})
         if(!modifier){
             return res.status(404).json({
-            status:'failure',
+            status:'error',
             message:'Modified group not found'
             })
         }
@@ -55,7 +55,7 @@ const ModifierController = {
         let modifier = await Modifier.findByIdAndUpdate({_id:req.params.id}, {...req.body})
         if(!modifier){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'Modified group not found'
             })
         }

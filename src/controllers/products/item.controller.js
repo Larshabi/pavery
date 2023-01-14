@@ -1,12 +1,13 @@
 const Item = require('../../models/item');
 const {itemValidationBody} = require('./products.validation');
+const {parse} = require('json2csv');
 
 const ItemController = {
     async createItem(req, res){
         const {error, value} = itemValidationBody(req.body);
         if(error){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 error
             })
         }
@@ -21,7 +22,7 @@ const ItemController = {
         const item = await Item.find({});
         if(!item){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'No Item found'
             })
         }
@@ -34,13 +35,34 @@ const ItemController = {
         const item = await Item.findOne({_id:req.query.id})
         if(!item){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'No Item found'
             })
         }
         return res.status(200).json({
             status:'success',
             item
+        })
+    },
+    async downloadTemplate(req, res){
+        const fields = Object.keys(Item.schema.obj);
+        const csv = parse({data:'', fields})
+        res.set("Content-Disposition", "attachment;filename=item.csv");
+        res.set("Content-Type", "application/octet-stream");
+
+        res.send(csv);
+    },
+    async updateItem(req, res){
+        const item = await Item.findOneAndUpdate({_id:req.params.id}, {...req.body})
+        if(!item){
+            return res.status(400).json({
+                status:'error',
+                message:'Item not found'
+            })
+        }
+        return res.status(200).json({
+            status:'success',
+            message:'Item successfully updated'
         })
     }
 }

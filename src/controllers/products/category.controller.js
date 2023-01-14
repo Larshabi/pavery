@@ -6,14 +6,14 @@ const CategoryController = {
         const {value, error} = categoriesValidationBody(req.body);
         if(error){
             return res.status(400).json({
-                status:'fail',
+                status:'error',
                 message:error.message
             })
         }
         let category = await Category.findOne({name:value.name})
         if(category){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'category exists'
             })
         }
@@ -28,7 +28,7 @@ const CategoryController = {
         const category = await Category.find({})
         if (!category){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'No category found'
             })
         }
@@ -41,7 +41,7 @@ const CategoryController = {
         const category = await Category.findById({_id:req.params.id})
         if (!category){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'No category found'
             })
         }
@@ -54,7 +54,7 @@ const CategoryController = {
         const category = await Category.findByIdAndUpdate({_id:req.params.id}, {...req.body})
         if (!category){
             return res.status(400).json({
-                status:'failure',
+                status:'error',
                 message:'No category found'
             })
         }
