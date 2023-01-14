@@ -15,4 +15,6 @@ router.post('/reset-password', asyncHandler(AuthController.resetPassword));
 router.get('/update-password/:hash', asyncHandler(AuthController.updatePassword));
 
 router.post('/refresh-email', asyncHandler(AuthController.refreshEmail));
+
+router.post('/refresh-token', asyncHandler(AuthController.refreshToken));
 module.exports = router;

@@ -6,26 +6,24 @@ const Token = require('../models/token');
 
 
 
-exports.emailVerification = async(user) => {
+exports.emailVerification = async (user) => {
     let hash = uuid();
-    console.log(hash)
     hash = hash.replace(/-/g, '');
     const expiresIn = moment().add(30, 'minutes').format()
-    console.log(user)
     const token = await Token.create({
         user: user._id,
         hash,
         expiresIn,
         type: 'email verification'
     })
-    const link = `http://localhost:8000/api/v1/verify-email/${token.hash}`;
-    console.log(user.email)
+    const links = `http://localhost:3000/api/v1/auth/verify-email/${token.hash}`;
     const msg = {
         to: user.email,
-        from: 'chisom.okafor@comeriver.com',
+        from: process.env.SENDGRID_EMAIL,
         subject: 'Email Verification',
-        text: link,
-        html: `<h1>Hello Chisom</h1>`
+        text: links,
+        html:`<p>Please verify your email with the link below</p>
+        <p>${links}</p>`
     }
     sgMail
         .send(msg)
@@ -50,12 +48,15 @@ exports.resetEmail = async(user) => {
         expiresIn,
         type: 'reset password'
     })
-    const link = `http://localhost:8000/api/v1/update-password/${token.hash}`;
+    const link = `http://localhost:3000/api/v1/auth/update-password/${token.hash}`;
     const msg = {
         to: user.email,
-        from: 'olalekanlasabi@gmail.com',
+        from: process.env.SENDGRID_EMAIL,
         subject: 'Reset Password',
-        text: link
+        text: link,
+        html:`<p>Please clink the link to reset password</p>
+        <p>${link}</p>
+        `
     }
     sgMail
         .send(msg)

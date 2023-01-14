@@ -33,8 +33,7 @@ const AuthController = {
         delete value.fullName
 
         user = await User.create({...value, firstName: firstName, lastName: lastName })
-        // await emailVerification(user)
-        console.log('done')
+        await emailVerification(user)
         user = _.pick(user, ['_id', 'email', 'phoheNumber', 'firstName', 'lastName'])
 
 
@@ -75,14 +74,15 @@ const AuthController = {
         }
 
         user = _.pick(user, ['firstName', 'lastName', 'email', 'phoneNumber', 'isActive', 'isVerified', 'lastLogin']);
-        console.log(user);
+        
 
         const filteredPayload = filterJwtPayload(user);
         const accessToken = encode(filteredPayload, process.env.accessTokenSecret, '2h')
-
-
+        const refreshToken = encode(filteredPayload, process.env.refreshTokenSecret, process.env.refreshTokenExpiresIn)
+        
         const tokens = {
             accessToken,
+            refreshToken
         }
 
         const now = new Date()
@@ -104,7 +104,7 @@ const AuthController = {
             return res.status(400).json({ message: 'Token expired' })
         }
         const user = await User.findOneAndUpdate({ _id: token.user }, { isVerified: true });
-        return res.status(200).json({ message: 'User Verified', user })
+        return res.status(200).json({ message: 'User Verified' })
     },
     async verifyTokenValidity(req, res) {
         const token = await Token.findOne({ hash: req.params.hash })
@@ -121,7 +121,7 @@ const AuthController = {
         if (!user) {
             return res.status(400).json({ message: 'Email not registered' });
         }
-        EmailVerification(user);
+        await emailVerification(user);
         return res.json({ message: 'Email verification mail sent' })
     },
     async resetPassword(req, res) {
@@ -147,6 +147,23 @@ const AuthController = {
 
         const user = await User.findOneAndUpdate({ _id: token.user }, { password: hash })
         return res.status(200).json({ message: 'Password updated' })
+    },
+    async refreshToken(req, res){
+        const payload = validate(req.body.token, process.env.refreshTokenSecret);
+        if (Date.now() >= payload.exp * 1000) {
+            return res.status(400).json({ message: 'Refresh Token Expired' });
+        }
+        let user = await User.findOne({_id:payload._id})
+        user = _.pick(user, ['_id', 'email'])
+        const tokens = {
+            accessToken : encode(user, process.env.accessTokenSecret, process.env.accessTokenExpiresIn),
+            refreshToken: encode(user, process.env.refreshTokenSecret, process.env.refreshTokenExpiresIn)
+        }
+        return res.json({
+            status: 'success',
+            message: 'token refreshed',
+            tokens,
+          });
     }
 
 }
