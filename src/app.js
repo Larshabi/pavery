@@ -4,10 +4,12 @@ const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const ErrorHandler = require('./helpers/error-handler');
 const cors = require('cors');
+const fileUpload = require('express-fileupload');
 const RouteV1 = require('./routes/v1/index');
 
 const app = express();
 
+app.use(fileUpload());
 app.use(express.json());
 app.use(cors({ origin: '*', optionsSuccessStatus: 200 }));
 app.use(bodyParser.json({ limit: '10mb' }));

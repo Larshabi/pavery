@@ -77,7 +77,7 @@ const AuthController = {
         
 
         const filteredPayload = filterJwtPayload(user);
-        const accessToken = encode(filteredPayload, process.env.accessTokenSecret, '2h')
+        const accessToken = encode(filteredPayload, process.env.accessTokenSecret, process.env.accessTokenExpiresIn)
         const refreshToken = encode(filteredPayload, process.env.refreshTokenSecret, process.env.refreshTokenExpiresIn)
         
         const tokens = {

@@ -61,18 +61,8 @@ const ItemController = {
                 modifiedGroup:''
             }
         ]
-        const csv = parse(fields)
-        fs.writeFile("item.csv", csv, function(err){
-            if(err){
-                return res.status(400).json({
-                    err
-                })
-            }
-            console.log('File saved')
-        })
-        // res.set("Content-Disposition", "attachment;filename=item.csv");
-        // res.set("Content-Type", "application/octet-stream");
-        res.attachment("item.csv")
+        const csv = parse(fields);
+        res.attachment("item.csv");
         res.send(csv);
     },
     async updateItem(req, res){
