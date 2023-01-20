@@ -2,8 +2,8 @@ const uuid = require('uuid').v4;
 const moment = require('moment');
 const sgMail = require('./sendgrid');
 const Token = require('../models/token');
-
-
+const localLink = `http://localhost:3000/api/v1`
+const developLink = `https://pavery.onrender.com`
 
 
 exports.emailVerification = async (user) => {
@@ -16,7 +16,7 @@ exports.emailVerification = async (user) => {
         expiresIn,
         type: 'email verification'
     })
-    const links = `http://localhost:3000/api/v1/auth/verify-email/${token.hash}`;
+    const links = `${developLink}/auth/verify-email/${token.hash}`;
     const msg = {
         to: user.email,
         from: process.env.SENDGRID_EMAIL,
@@ -48,7 +48,7 @@ exports.resetEmail = async(user) => {
         expiresIn,
         type: 'reset password'
     })
-    const link = `http://localhost:3000/api/v1/auth/update-password/${token.hash}`;
+    const link = `${localLink}/auth/update-password/${token.hash}`;
     const msg = {
         to: user.email,
         from: process.env.SENDGRID_EMAIL,
