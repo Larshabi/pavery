@@ -12,9 +12,11 @@ router.get('/verify-email/:hash', asyncHandler(AuthController.verifyEmail));
 
 router.post('/reset-password', asyncHandler(AuthController.resetPassword));
 
-router.get('/update-password/:hash', asyncHandler(AuthController.updatePassword));
+router.patch('/update-password/:hash', asyncHandler(AuthController.updatePassword));
 
 router.post('/refresh-email', asyncHandler(AuthController.refreshEmail));
 
 router.post('/refresh-token', asyncHandler(AuthController.refreshToken));
+
+router.get('/verify-token/:hash', asyncHandler(AuthController.verifyTokenValidity));
 module.exports = router;

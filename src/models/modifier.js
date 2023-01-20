@@ -5,6 +5,12 @@ const modifierSchema = new Schema({
         type:Boolean,
         default:false
     },
+    items:[
+        {
+            type:Schema.Types.ObjectId,
+            ref:'Item'
+        }
+    ]
 },
 {
     timestamps:true

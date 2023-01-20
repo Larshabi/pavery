@@ -17,14 +17,15 @@ exports.itemValidationBody = (payload)=>{
          VAT:Joi.number().required(),
          pricePerChannel:Joi.boolean().required(),
          category:Joi.objectId(),
-         modifiedGroup:Joi.array()
+         modifierGroup:Joi.array()
    })
    return schema.validate(payload);
 }
 
 exports.modifierValidationBody = (payload)=>{
    const schema = Joi.object({
-      name:Joi.string().required()
+      name:Joi.string().required(),
+      items:Joi.array()
    })
    return schema.validate(payload);
 }

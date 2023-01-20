@@ -77,6 +77,8 @@ const AuthController = {
         
 
         const filteredPayload = filterJwtPayload(user);
+        // const encodeAccessSecret = Buffer.from(process.env.accessTokenSecret).toString('base64');
+        // const encodeRefreshSecret = Buffer.from(process.env.refreshTokenSecret).toString('base64');
         const accessToken = encode(filteredPayload, process.env.accessTokenSecret, process.env.accessTokenExpiresIn)
         const refreshToken = encode(filteredPayload, process.env.refreshTokenSecret, process.env.refreshTokenExpiresIn)
         
@@ -139,11 +141,11 @@ const AuthController = {
         if (!token) {
             return res.status(400).json({ message: 'Invalid token' })
         }
-        if (!moment().isAfter(moment(token.expiresIn))) {
+        if (moment().isAfter(moment(token.expiresIn))) {
             return res.status(400).json({ message: 'Token Expired' })
         }
-        const salt = bcrypt.gensalt();
-        const hash = bcrypt.hash(req.body.password, salt);
+        const salt = await bcrypt.genSalt();
+        const hash = await bcrypt.hash(req.body.password, salt);
 
         const user = await User.findOneAndUpdate({ _id: token.user }, { password: hash })
         return res.status(200).json({ message: 'Password updated' })

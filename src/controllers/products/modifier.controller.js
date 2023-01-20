@@ -14,22 +14,22 @@ const ModifierController = {
         if(modifier){
             return res.status(400).json({
                 status:'error',
-                message:'Modified group exists'
+                message:'Modifier group exists'
             })
         }
         modifier = await Modifier.create(value)
         return res.status(201).json({
             status:'success',
-            message:'Modified group created',
+            message:'Modifier group created',
             modifier
         })
     },
     async getModifiers(req, res){
-        const modifiers = await Modifier.find({})
+        const modifiers = await Modifier.find({}).populate({path:'items', select:'name'})
         if(!modifiers){
             return res.status(400).json({
                 status:'error',
-                message:'There are no modified groups'
+                message:'There are no modifier groups'
             })
         }
         return res.status(200).json({
@@ -39,11 +39,11 @@ const ModifierController = {
     },
     async getAmodifier(req,res){
         const { id } = req.params;
-        const modifier = await Modifier.findOne({_id:id})
+        const modifier = await Modifier.findOne({_id:id}).populate({path:'items', select:'name'})
         if(!modifier){
             return res.status(404).json({
             status:'error',
-            message:'Modified group not found'
+            message:'Modifier group not found'
             })
         }
         return res.status(200).json({
@@ -52,16 +52,16 @@ const ModifierController = {
         })
     },
     async updateModifier(req, res){
-        let modifier = await Modifier.findByIdAndUpdate({_id:req.params.id}, {...req.body})
+        let modifier = await Modifier.findByIdAndUpdate({_id:req.params.id}, req.body)
         if(!modifier){
             return res.status(400).json({
                 status:'error',
-                message:'Modified group not found'
+                message:'Modifier group not found'
             })
         }
         return res.status(200).json({
             status:'success',
-            message:'Modified group successfully updated'
+            message:'Modifier group successfully updated'
         })
     }
 }

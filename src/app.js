@@ -9,7 +9,10 @@ const RouteV1 = require('./routes/v1/index');
 
 const app = express();
 
-app.use(fileUpload());
+app.use(fileUpload({
+    useTempFiles:true,
+    limits: {fileSize: 50 * 1024 * 1024}
+}));
 app.use(express.json());
 app.use(cors({ origin: '*', optionsSuccessStatus: 200 }));
 app.use(bodyParser.json({ limit: '10mb' }));

@@ -2,6 +2,7 @@ const Item = require('../../models/item');
 const {itemValidationBody} = require('./products.validation');
 const {parse} = require('json2csv');
 const fs = require('fs');
+const csv = require('fast-csv');
 
 const ItemController = {
     async createItem(req, res){
@@ -13,14 +14,16 @@ const ItemController = {
             })
         }
         const item = await Item.create(value);
-        return res0.status(201).json({
+        return res.status(201).json({
             status:'success',
             message:'Item successfully created',
             item
         })
     },
     async getItems(req, res){
-        const item = await Item.find({});
+        const item = await Item.find({}).populate(
+            { path: 'modifierGroup', select: 'name' }
+            );
         if(!item){
             return res.status(400).json({
                 status:'error',
@@ -33,7 +36,9 @@ const ItemController = {
         })
     },
     async getItem(req, res){
-        const item = await Item.findOne({_id:req.query.id})
+        const item = await Item.findOne({_id:req.params.id}).populate(
+        { path: 'modifierGroup', select: 'name' }
+        );
         if(!item){
             return res.status(400).json({
                 status:'error',
@@ -61,9 +66,9 @@ const ItemController = {
                 modifiedGroup:''
             }
         ]
-        const csv = parse(fields);
+        const csvFile= parse(fields);
         res.attachment("item.csv");
-        res.send(csv);
+        res.send(csvFile);
     },
     async updateItem(req, res){
         const item = await Item.findOneAndUpdate({_id:req.params.id}, {...req.body})
@@ -77,6 +82,16 @@ const ItemController = {
             status:'success',
             message:'Item successfully updated'
         })
+    },
+    async upload(req, res){
+        if(!req.files){
+            return res.status(400).json({
+                status:'error',
+                message:'No file was uploaded'
+            })
+        }
+        const itemFile = req.files.file;
+
     }
 }
 

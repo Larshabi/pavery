@@ -60,7 +60,7 @@ const CategoryController = {
         }
         return res.status(200).json({
             status:'success',
-            category
+            message:'Category updated successfully'
         })
     }
 }

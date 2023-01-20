@@ -9,7 +9,6 @@ const options = {
 };
 
 mongoose.set('strictQuery', false)
-console.log(process.env.MONGO_URI)
 mongoose.connect(process.env.MONGO_URI, options)
     .then(() => {
         console.log(`Mongoose default connection to ${process.env.MONGO_URI}`)
