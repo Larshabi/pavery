@@ -3,7 +3,7 @@ const moment = require('moment');
 const sgMail = require('./sendgrid');
 const Token = require('../models/token');
 const localLink = `http://localhost:3000/api/v1`
-const developLink = `https://pavery.onrender.com`
+const developLink = `https://pavery.onrender.com/api/v1`
 
 
 exports.emailVerification = async (user) => {

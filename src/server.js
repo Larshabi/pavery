@@ -9,9 +9,9 @@ const options = {
 };
 
 mongoose.set('strictQuery', false)
-mongoose.connect(process.env.MONGO_URI, options)
+mongoose.connect(process.env.MONGO_URI_CLOUD, options)
     .then(() => {
-        console.log(`Mongoose default connection to ${process.env.MONGO_URI}`)
+        console.log(`Mongoose default connection to ${process.env.MONGO_URI_CLOUD}`)
     });
 
 const port = process.env.PORT || 8000
